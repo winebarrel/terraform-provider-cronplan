@@ -1,0 +1,32 @@
+name: test
+on:
+  pull_request:
+    paths-ignore:
+      - .github/dependabot.yml
+      - docs/**/*
+      - examples/**/*
+      - LICENSE
+      - README.md
+  push:
+    paths-ignore:
+      - .github/dependabot.yml
+      - docs/**/*
+      - examples/**/*
+      - LICENSE
+      - README.md
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+      - uses: golangci/golangci-lint-action@v3
+      - run: make vet
+      - run: make test
