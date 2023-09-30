@@ -1,0 +1,4 @@
+/terraform-provider-cronplan
+/*.tf
+/*.tfstate*
+/dev.tfrc
