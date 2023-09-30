@@ -1,5 +1,5 @@
 data "cronplan_expr" "every_weekday" {
-  cron = "5 0 ? * MON-FRI *"
+  expr = "cron(5 0 ? * MON-FRI *)"
   from = "2023-09-30 10:00:00 UTC"
 }
 
