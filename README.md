@@ -1,5 +1,8 @@
 # terraform-provider-cronplan
 
+[![test](https://github.com/winebarrel/terraform-provider-cronplan/actions/workflows/test.yml/badge.svg)](https://github.com/winebarrel/terraform-provider-cronplan/actions/workflows/test.yml)
+[![terraform docs](https://img.shields.io/badge/terraform-docs-%35835CC?logo=terraform)](https://registry.terraform.io/providers/winebarrel/cronplan/latest/docs)
+
 Terraform provider to validate Amazon EventBridge Cron expressions.
 
 ## Usage
