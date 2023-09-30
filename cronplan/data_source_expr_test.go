@@ -158,7 +158,26 @@ func TestExpr_validationError(t *testing.T) {
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,
-				ExpectError: regexp.MustCompile(`'?' cannot be set to both day-of-month and day-of-week`),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`'?' cannot be set to both day-of-month and day-of-week`)),
+				PlanOnly:    true,
+			},
+		},
+	})
+}
+
+func TestExpr_unsupported(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					data "cronplan_expr" "every_day" {
+						expr = "norc(5 3 ? * ? *)"
+						from = "2022-04-15 12:22:30 UTC"
+					}
+				`,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Unsupported schedule expression: norc(5 3 ? * ? *)`)),
 				PlanOnly:    true,
 			},
 		},
