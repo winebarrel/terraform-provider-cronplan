@@ -15,12 +15,12 @@ func TestExpr_basic(t *testing.T) {
 			{
 				Config: `
 					data "cronplan_expr" "every_day" {
-						cron = "0 0 * * ? *"
+						expr = "0 0 * * ? *"
 						from = "2022-03-14 11:12:30 UTC"
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "cron", "0 0 * * ? *"),
+					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "expr", "0 0 * * ? *"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "from", "2022-03-14 11:12:30 UTC"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "num_schedules", "10"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "schedules.#", "10"),
@@ -39,12 +39,12 @@ func TestExpr_basic(t *testing.T) {
 			{
 				Config: `
 					data "cronplan_expr" "every_day" {
-						cron = "5 3 * * ? *"
+						expr = "5 3 * * ? *"
 						from = "2022-03-14 11:12:30 UTC"
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "cron", "5 3 * * ? *"),
+					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "expr", "5 3 * * ? *"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "from", "2022-03-14 11:12:30 UTC"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "num_schedules", "10"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "schedules.#", "10"),
@@ -63,12 +63,12 @@ func TestExpr_basic(t *testing.T) {
 			{
 				Config: `
 					data "cronplan_expr" "every_day" {
-						cron = "5 3 * * ? *"
+						expr = "5 3 * * ? *"
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "cron", "5 3 * * ? *"),
+					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "expr", "5 3 * * ? *"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "from", "2022-04-15 12:22:30 UTC"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "num_schedules", "10"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "schedules.#", "10"),
@@ -87,13 +87,13 @@ func TestExpr_basic(t *testing.T) {
 			{
 				Config: `
 					data "cronplan_expr" "every_day" {
-						cron          = "5 3 * * ? *"
+						expr          = "5 3 * * ? *"
 						from          = "2022-04-15 12:22:30 UTC"
 						num_schedules = 3
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "cron", "5 3 * * ? *"),
+					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "expr", "5 3 * * ? *"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "from", "2022-04-15 12:22:30 UTC"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "num_schedules", "3"),
 					resource.TestCheckResourceAttr("data.cronplan_expr.every_day", "schedules.#", "3"),
@@ -114,7 +114,7 @@ func TestExpr_validationError(t *testing.T) {
 			{
 				Config: `
 					data "cronplan_expr" "every_day" {
-						cron = "5 3 ? * ? *"
+						expr = "5 3 ? * ? *"
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,

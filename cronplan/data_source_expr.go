@@ -2,6 +2,9 @@ package cronplan
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"regexp"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -11,15 +14,27 @@ import (
 	cp "github.com/winebarrel/cronplan"
 )
 
+var (
+	ScheduleExprCron *regexp.Regexp
+	ScheduleExprRate *regexp.Regexp
+	ScheduleExprAt   *regexp.Regexp
+)
+
+func init() {
+	ScheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
+	ScheduleExprRate = regexp.MustCompile(`^rate\([^)]+\)$`)
+	ScheduleExprAt = regexp.MustCompile(`^at\([^)]+\)$`)
+}
+
 func dataSourceExpr() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: readExpr,
 		Schema: map[string]*schema.Schema{
-			"cron": {
+			"expr": {
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
-					if _, err := cp.Parse(val.(string)); err != nil {
+					if _, err := evalCron(val.(string), "", 0); err != nil {
 						errs = append(errs, err)
 					}
 					return
@@ -46,7 +61,7 @@ func dataSourceExpr() *schema.Resource {
 }
 
 func readExpr(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	expr := d.Get("cron").(string)
+	expr := d.Get("expr").(string)
 	from := d.Get("from").(string)
 	n := d.Get("num_schedules").(int)
 	schedule, err := evalCron(expr, from, n)
@@ -62,6 +77,17 @@ func readExpr(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagno
 }
 
 func evalCron(expr string, fromStr string, n int) ([]string, error) {
+	if m := ScheduleExprCron.FindStringSubmatch(expr); len(m) == 2 {
+		expr = m[1]
+		log.Println(m)
+	} else if ScheduleExprRate.MatchString(expr) {
+		return []string{}, nil
+	} else if ScheduleExprAt.MatchString(expr) {
+		return []string{}, nil
+	} else {
+		return nil, fmt.Errorf("Unsupported schedule expression: %s", expr)
+	}
+
 	cron, err := cp.Parse(expr)
 
 	if err != nil {
