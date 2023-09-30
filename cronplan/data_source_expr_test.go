@@ -158,7 +158,17 @@ func TestExpr_validationError(t *testing.T) {
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`'?' cannot be set to both day-of-month and day-of-week`)),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Parse 'expr' failed: 'cron(5 3 ? * ? *)': '?' cannot be set to both day-of-month and day-of-week`)),
+				PlanOnly:    true,
+			},
+			{
+				Config: `
+					data "cronplan_expr" "every_day" {
+						expr = "cron(5 3 * * ? *)"
+						from = "London Bridge is broken down"
+					}
+				`,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Parse 'from' failed: Could not find format for "London Bridge is broken down"`)),
 				PlanOnly:    true,
 			},
 		},
@@ -177,7 +187,7 @@ func TestExpr_unsupported(t *testing.T) {
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Unsupported schedule expression: norc(5 3 ? * ? *)`)),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Unsupported schedule expression: 'norc(5 3 ? * ? *)'`)),
 				PlanOnly:    true,
 			},
 		},

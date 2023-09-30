@@ -3,7 +3,6 @@ package cronplan
 import (
 	"context"
 	"fmt"
-	"log"
 	"regexp"
 	"time"
 
@@ -77,21 +76,22 @@ func readExpr(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagno
 }
 
 func evalCron(expr string, fromStr string, n int) ([]string, error) {
+	var cronExpr string
+
 	if m := ScheduleExprCron.FindStringSubmatch(expr); len(m) == 2 {
-		expr = m[1]
-		log.Println(m)
+		cronExpr = m[1]
 	} else if ScheduleExprRate.MatchString(expr) {
 		return []string{}, nil
 	} else if ScheduleExprAt.MatchString(expr) {
 		return []string{}, nil
 	} else {
-		return nil, fmt.Errorf("Unsupported schedule expression: %s", expr)
+		return nil, fmt.Errorf("Unsupported schedule expression: '%s'", expr)
 	}
 
-	cron, err := cp.Parse(expr)
+	cron, err := cp.Parse(cronExpr)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Parse 'expr' failed: '%s': %w", expr, err)
 	}
 
 	from := time.Now()
@@ -100,7 +100,7 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 		from, err = dateparse.ParseAny(fromStr)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Parse 'from' failed: %w", err)
 		}
 	}
 
