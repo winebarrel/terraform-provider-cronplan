@@ -16,9 +16,8 @@ provider "cronplan" {
 }
 
 data "cronplan_expr" "every_weekday" {
-  # NOTE: Cron expressions are validated with terraform plan.
-  #       at() and rate() are ignored.
-  cron = "cron(5 0 ? * MON-FRI *)"
+  # NOTE: Expression is validated with terraform plan.
+  expr = "cron(5 0 ? * MON-FRI *)"
   from = "2023-09-30 10:00:00 UTC" # Optional
 }
 
