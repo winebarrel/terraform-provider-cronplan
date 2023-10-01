@@ -126,7 +126,7 @@ func TestExpr_rate(t *testing.T) {
 	})
 }
 
-func TestExpr_ratErr(t *testing.T) {
+func TestExpr_rateErr(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -137,7 +137,8 @@ func TestExpr_ratErr(t *testing.T) {
 						expr = "rate(minute)"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Unexpected rate expr: 'rate(minute)': does not match '^(\d+) (?:minute|minutes|hour|hours|day|days)$'`)),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Failed to parse expr: 'rate(minute)': does not match '^(\d+) (?:minute|minutes|hour|hours|day|days)$'`)),
+				PlanOnly:    true,
 			},
 			{
 				Config: `
@@ -145,7 +146,8 @@ func TestExpr_ratErr(t *testing.T) {
 						expr = "rate(0 minute)"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Expr value is less than or equal to 0: 'rate(0 minute)'")),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Rate expr value must be '>= 1': 'rate(0 minute)'")),
+				PlanOnly:    true,
 			},
 		},
 	})
@@ -171,6 +173,24 @@ func TestExpr_at(t *testing.T) {
 	})
 }
 
+func TestExpr_atErr(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					data "cronplan_expr" "at_expr" {
+						expr = "at(2016/03/04T17:27:00)"
+					}
+				`,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Failed to parse expr: 'at(2016/03/04T17:27:00)': does not match '2006-01-02T15:04:05'")),
+				PlanOnly:    true,
+			},
+		},
+	})
+}
+
 func TestExpr_validationError(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -183,7 +203,7 @@ func TestExpr_validationError(t *testing.T) {
 						from = "2022-04-15 12:22:30 UTC"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Parse 'expr' failed: 'cron(5 3 ? * ? *)': '?' cannot be set to both day-of-month and day-of-week`)),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Failed to parse expr:'cron(5 3 ? * ? *)': '?' cannot be set to both day-of-month and day-of-week`)),
 				PlanOnly:    true,
 			},
 			{
@@ -193,7 +213,7 @@ func TestExpr_validationError(t *testing.T) {
 						from = "London Bridge is broken down"
 					}
 				`,
-				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Parse 'from' failed: Could not find format for "London Bridge is broken down"`)),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Failed to parse 'from': Could not find format for "London Bridge is broken down"`)),
 				PlanOnly:    true,
 			},
 		},

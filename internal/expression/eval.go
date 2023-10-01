@@ -10,18 +10,22 @@ import (
 	cp "github.com/winebarrel/cronplan"
 )
 
+const (
+	atExprFormat = "2006-01-02T15:04:05"
+)
+
 var (
 	scheduleExprCron *regexp.Regexp
 	scheduleExprRate *regexp.Regexp
 	scheduleExprAt   *regexp.Regexp
-	rateExpr         *regexp.Regexp
+	rateExprRegexp   *regexp.Regexp
 )
 
 func init() {
 	scheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
 	scheduleExprRate = regexp.MustCompile(`^rate\(([^)]+)\)$`)
-	scheduleExprAt = regexp.MustCompile(`^at\([^)]+\)$`)
-	rateExpr = regexp.MustCompile(`^(\d+) (?:minute|minutes|hour|hours|day|days)$`)
+	scheduleExprAt = regexp.MustCompile(`^at\(([^)]+)\)$`)
+	rateExprRegexp = regexp.MustCompile(`^(\d+) (?:minute|minutes|hour|hours|day|days)$`)
 }
 
 func Validate(expr string) error {
@@ -34,8 +38,8 @@ func Eval(expr string, fromStr string, n int) ([]string, error) {
 		return evalCron(m[1], fromStr, n)
 	} else if m := scheduleExprRate.FindStringSubmatch(expr); len(m) == 2 {
 		return []string{}, evalRate(m[1])
-	} else if scheduleExprAt.MatchString(expr) {
-		return []string{}, nil
+	} else if m := scheduleExprAt.FindStringSubmatch(expr); len(m) == 2 {
+		return []string{}, evalAt(m[1])
 	} else {
 		return nil, fmt.Errorf("Unsupported schedule expression: '%s'", expr)
 	}
@@ -45,7 +49,7 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 	cron, err := cp.Parse(expr)
 
 	if err != nil {
-		return nil, fmt.Errorf("Parse 'expr' failed: 'cron(%s)': %w", expr, err)
+		return nil, fmt.Errorf("Failed to parse expr:'cron(%s)': %w", expr, err)
 	}
 
 	from := time.Now()
@@ -54,7 +58,7 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 		from, err = dateparse.ParseAny(fromStr)
 
 		if err != nil {
-			return nil, fmt.Errorf("Parse 'from' failed: %w", err)
+			return nil, fmt.Errorf("Failed to parse 'from': %w", err)
 		}
 	}
 
@@ -69,20 +73,30 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 }
 
 func evalRate(expr string) error {
-	m := rateExpr.FindStringSubmatch(expr)
+	m := rateExprRegexp.FindStringSubmatch(expr)
 
 	if len(m) != 2 {
-		return fmt.Errorf("Unexpected rate expr: 'rate(%s)': does not match '%s'", expr, rateExpr)
+		return fmt.Errorf("Failed to parse expr: 'rate(%s)': does not match '%s'", expr, rateExprRegexp)
 	}
 
 	v, err := strconv.Atoi(m[1])
 
 	if err != nil {
-		return fmt.Errorf("Parse expr value failed: 'rate(%s)': %w", expr, err)
+		return fmt.Errorf("Failed to parse rate value: 'rate(%s)': %w", expr, err)
 	}
 
 	if v < 1 {
-		return fmt.Errorf("Expr value is less than or equal to 0: 'rate(%s)'", expr)
+		return fmt.Errorf("Rate expr value must be '>= 1': 'rate(%s)'", expr)
+	}
+
+	return nil
+}
+
+func evalAt(expr string) error {
+	_, err := time.Parse(atExprFormat, expr)
+
+	if err != nil {
+		return fmt.Errorf("Failed to parse expr: 'at(%s)': does not match '%s'", expr, atExprFormat)
 	}
 
 	return nil
