@@ -2,15 +2,12 @@ package cronplan
 
 import (
 	"context"
-	"fmt"
 	"regexp"
-	"time"
 
-	"github.com/araddon/dateparse"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/id"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	cp "github.com/winebarrel/cronplan"
+	"github.com/winebarrel/terraform-provider-cronplan/internal/expression"
 )
 
 var (
@@ -33,7 +30,7 @@ func dataSourceExpr() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
-					if _, err := evalCron(val.(string), "", 0); err != nil {
+					if err := expression.Validate(val.(string)); err != nil {
 						errs = append(errs, err)
 					}
 					return
@@ -63,7 +60,7 @@ func readExpr(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagno
 	expr := d.Get("expr").(string)
 	from := d.Get("from").(string)
 	n := d.Get("num_schedules").(int)
-	schedule, err := evalCron(expr, from, n)
+	schedule, err := expression.Eval(expr, from, n)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -73,43 +70,4 @@ func readExpr(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagno
 	d.Set("schedules", schedule) //nolint:errcheck
 
 	return nil
-}
-
-func evalCron(expr string, fromStr string, n int) ([]string, error) {
-	var cronExpr string
-
-	if m := ScheduleExprCron.FindStringSubmatch(expr); len(m) == 2 {
-		cronExpr = m[1]
-	} else if ScheduleExprRate.MatchString(expr) {
-		return []string{}, nil
-	} else if ScheduleExprAt.MatchString(expr) {
-		return []string{}, nil
-	} else {
-		return nil, fmt.Errorf("Unsupported schedule expression: '%s'", expr)
-	}
-
-	cron, err := cp.Parse(cronExpr)
-
-	if err != nil {
-		return nil, fmt.Errorf("Parse 'expr' failed: '%s': %w", expr, err)
-	}
-
-	from := time.Now()
-
-	if fromStr != "" {
-		from, err = dateparse.ParseAny(fromStr)
-
-		if err != nil {
-			return nil, fmt.Errorf("Parse 'from' failed: %w", err)
-		}
-	}
-
-	schedule := []string{}
-	next := cron.NextN(from, n)
-
-	for _, v := range next {
-		schedule = append(schedule, v.Format("Mon, 02 Jan 2006 15:04:05"))
-	}
-
-	return schedule, nil
 }
