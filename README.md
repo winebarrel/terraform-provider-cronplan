@@ -7,7 +7,7 @@ Terraform provider to validate Amazon EventBridge Cron expressions.
 
 If the cron expression is incorrect, an error will occur in terraform plan.
 
-![](https://github.com/winebarrel/terraform-provider-cronplan/assets/117768/1847ec79-49d6-4ceb-9aa8-f256e70b2052)
+![](https://github.com/winebarrel/terraform-provider-cronplan/assets/117768/36f3a5db-32b9-4ebb-a554-2b67ebc85174)
 
 ## Usage
 
