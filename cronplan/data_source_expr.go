@@ -18,7 +18,7 @@ var (
 
 func init() {
 	ScheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
-	ScheduleExprRate = regexp.MustCompile(`^rate\([^)]+\)$`)
+	ScheduleExprRate = regexp.MustCompile(`^rate\(([^)]+)\)$`)
 	ScheduleExprAt = regexp.MustCompile(`^at\([^)]+\)$`)
 }
 

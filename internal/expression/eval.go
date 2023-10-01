@@ -3,6 +3,7 @@ package expression
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -10,15 +11,17 @@ import (
 )
 
 var (
-	ScheduleExprCron *regexp.Regexp
-	ScheduleExprRate *regexp.Regexp
-	ScheduleExprAt   *regexp.Regexp
+	scheduleExprCron *regexp.Regexp
+	scheduleExprRate *regexp.Regexp
+	scheduleExprAt   *regexp.Regexp
+	rateExpr         *regexp.Regexp
 )
 
 func init() {
-	ScheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
-	ScheduleExprRate = regexp.MustCompile(`^rate\([^)]+\)$`)
-	ScheduleExprAt = regexp.MustCompile(`^at\([^)]+\)$`)
+	scheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
+	scheduleExprRate = regexp.MustCompile(`^rate\(([^)]+)\)$`)
+	scheduleExprAt = regexp.MustCompile(`^at\([^)]+\)$`)
+	rateExpr = regexp.MustCompile(`^(\d+) (?:minute|minutes|hour|hours|day|days)$`)
 }
 
 func Validate(expr string) error {
@@ -27,11 +30,11 @@ func Validate(expr string) error {
 }
 
 func Eval(expr string, fromStr string, n int) ([]string, error) {
-	if m := ScheduleExprCron.FindStringSubmatch(expr); len(m) == 2 {
+	if m := scheduleExprCron.FindStringSubmatch(expr); len(m) == 2 {
 		return evalCron(m[1], fromStr, n)
-	} else if ScheduleExprRate.MatchString(expr) {
-		return []string{}, nil
-	} else if ScheduleExprAt.MatchString(expr) {
+	} else if m := scheduleExprRate.FindStringSubmatch(expr); len(m) == 2 {
+		return []string{}, evalRate(m[1])
+	} else if scheduleExprAt.MatchString(expr) {
 		return []string{}, nil
 	} else {
 		return nil, fmt.Errorf("Unsupported schedule expression: '%s'", expr)
@@ -63,4 +66,24 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 	}
 
 	return schedule, nil
+}
+
+func evalRate(expr string) error {
+	m := rateExpr.FindStringSubmatch(expr)
+
+	if len(m) != 2 {
+		return fmt.Errorf("Unexpected rate expr: 'rate(%s)': does not match '%s'", expr, rateExpr)
+	}
+
+	v, err := strconv.Atoi(m[1])
+
+	if err != nil {
+		return fmt.Errorf("Parse expr value failed: 'rate(%s)': %w", expr, err)
+	}
+
+	if v < 1 {
+		return fmt.Errorf("Expr value is less than or equal to 0: 'rate(%s)'", expr)
+	}
+
+	return nil
 }

@@ -126,6 +126,31 @@ func TestExpr_rate(t *testing.T) {
 	})
 }
 
+func TestExpr_ratErr(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					data "cronplan_expr" "every_minutes" {
+						expr = "rate(minute)"
+					}
+				`,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`Unexpected rate expr: 'rate(minute)': does not match '^(\d+) (?:minute|minutes|hour|hours|day|days)$'`)),
+			},
+			{
+				Config: `
+					data "cronplan_expr" "every_minutes" {
+						expr = "rate(0 minute)"
+					}
+				`,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Expr value is less than or equal to 0: 'rate(0 minute)'")),
+			},
+		},
+	})
+}
+
 func TestExpr_at(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
