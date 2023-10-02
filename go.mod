@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.29.0
 	github.com/hashicorp/terraform-plugin-testing v1.5.1
 	github.com/stretchr/testify v1.8.4
-	github.com/winebarrel/cronplan v1.10.0
+	github.com/winebarrel/cronplan v1.10.1
 )
 
 require (
