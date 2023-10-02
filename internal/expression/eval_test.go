@@ -25,7 +25,7 @@ func TestEvalCron_Err(t *testing.T) {
 	assert := assert.New(t)
 
 	_, err := expression.EvalCron("0 0 ? * ? *", "2023/10/01 00:00", 3)
-	assert.ErrorContains(err, "Failed to parse expr:'cron(0 0 ? * ? *)': '?' cannot be set to both day-of-month and day-of-week")
+	assert.ErrorContains(err, "Failed to parse expr: 'cron(0 0 ? * ? *)': '?' cannot be set to both day-of-month and day-of-week")
 }
 
 func TestEvalRate_OK(t *testing.T) {
