@@ -49,7 +49,7 @@ func evalCron(expr string, fromStr string, n int) ([]string, error) {
 	cron, err := cp.Parse(expr)
 
 	if err != nil {
-		return nil, fmt.Errorf("Failed to parse expr:'cron(%s)': %w", expr, err)
+		return nil, fmt.Errorf("Failed to parse expr: 'cron(%s)': %w", expr, err)
 	}
 
 	from := time.Now()
