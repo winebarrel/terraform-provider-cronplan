@@ -16,7 +16,7 @@ lint:
 
 .PHONY: clean
 clean:
-	rm -f terraform-provider-redash
+	rm -f terraform-provider-cronplan
 
 dev.tfrc: dev.tfrc.tpl
 	sed "s|{{PATH_TO_PROVIDER}}|$(shell pwd)|" dev.tfrc.tpl > dev.tfrc
