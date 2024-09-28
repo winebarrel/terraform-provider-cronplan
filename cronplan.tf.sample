@@ -20,7 +20,7 @@ output "every_weekday" {
 
 output "every_friday" {
   # If the expression is correct, the expression is returned.
-  value = provider::cronplan::expr("cron(5 0 ? * MON-FRI *)")
+  value = provider::cronplan::expr("cron(5 0 ? * FRI *)")
 }
 
 check "every_weekday_schedules" {
