@@ -33,7 +33,6 @@ tf-apply: build dev.tfrc
 tf-clean: clean
 	rm -f dev.tfrc terraform.tfstate*
 
-# cf. https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-documentation-generation
 .PHONY: docs
 docs:
-	go generate ./...
+	cd tools; go generate ./...
