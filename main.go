@@ -1,24 +1,32 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
-	"github.com/winebarrel/terraform-provider-cronplan/cronplan"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/winebarrel/terraform-provider-cronplan/internal/provider"
 )
 
-// Provider documentation generation.
-//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cronplan
+var (
+	version string = "dev"
+)
 
 func main() {
-	debug := flag.Bool("debug", false, "debug mode")
+	var debug bool
+
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
 	flag.Parse()
 
-	opts := &plugin.ServeOpts{
-		ProviderFunc: cronplan.Provider,
-		ProviderAddr: "registry.terraform.io/winebarrel/cronplan",
-		Debug:        *debug,
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/winebarrel/cronplan",
+		Debug:   debug,
 	}
 
-	plugin.Serve(opts)
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

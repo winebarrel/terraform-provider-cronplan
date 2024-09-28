@@ -47,14 +47,13 @@ check "every_weekday_schedules" {
 
 ### Required
 
-- `expr` (String)
+- `expr` (String) Amazon EventBridge schedule expression. see https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html
 
 ### Optional
 
-- `from` (String)
-- `num_schedules` (Number)
+- `from` (String) Cron expression start date.
+- `num_schedules` (Number) Number of schedules to output.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `schedules` (List of String)
+- `schedules` (List of String) Cron expression schedules
