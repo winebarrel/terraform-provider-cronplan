@@ -12,6 +12,15 @@ If the cron expression is incorrect, an error will occur in terraform plan.
 ## Usage
 
 ```tf
+terraform {
+  required_providers {
+    oneshot = {
+      source  = "winebarrel/cronplan"
+      version = ">= 0.3.0"
+    }
+  }
+}
+
 provider "cronplan" {
 }
 
