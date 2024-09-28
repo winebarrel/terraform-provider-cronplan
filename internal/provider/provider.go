@@ -54,7 +54,9 @@ func (p *CronplanProvider) DataSources(ctx context.Context) []func() datasource.
 }
 
 func (p *CronplanProvider) Functions(ctx context.Context) []func() function.Function {
-	return []func() function.Function{}
+	return []func() function.Function{
+		NewExprFunction,
+	}
 }
 
 func New(version string) func() provider.Provider {

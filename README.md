@@ -12,6 +12,15 @@ If the cron expression is incorrect, an error will occur in terraform plan.
 ## Usage
 
 ```tf
+terraform {
+  required_providers {
+    oneshot = {
+      source  = "winebarrel/cronplan"
+      version = ">= 0.3.0"
+    }
+  }
+}
+
 provider "cronplan" {
 }
 
@@ -23,6 +32,11 @@ data "cronplan_expr" "every_weekday" {
 
 output "every_weekday" {
   value = data.cronplan_expr.every_weekday.schedules
+}
+
+output "every_friday" {
+  # If the expression is correct, the expression is returned.
+  value = provider::cronplan::expr("cron(5 0 ? * MON-FRI *)")
 }
 
 check "every_weekday_schedules" {
