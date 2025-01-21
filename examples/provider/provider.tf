@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    oneshot = {
+    cronplan = {
       source  = "winebarrel/cronplan"
       version = ">= 3"
     }
