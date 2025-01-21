@@ -14,7 +14,7 @@ If the cron expression is incorrect, an error will occur in terraform plan.
 ```tf
 terraform {
   required_providers {
-    oneshot = {
+    cronplan = {
       source  = "winebarrel/cronplan"
       version = ">= 3"
     }
