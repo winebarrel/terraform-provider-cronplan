@@ -3,7 +3,7 @@
 page_title: "cronplan Provider"
 subcategory: ""
 description: |-
-  
+
 ---
 
 # cronplan Provider
@@ -15,7 +15,7 @@ description: |-
 ```terraform
 terraform {
   required_providers {
-    oneshot = {
+    cronplan = {
       source  = "winebarrel/cronplan"
       version = ">= 3"
     }
