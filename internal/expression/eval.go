@@ -15,18 +15,11 @@ const (
 )
 
 var (
-	scheduleExprCron *regexp.Regexp
-	scheduleExprRate *regexp.Regexp
-	scheduleExprAt   *regexp.Regexp
-	rateExprRegexp   *regexp.Regexp
-)
-
-func init() {
 	scheduleExprCron = regexp.MustCompile(`^cron\(([^)]+)\)$`)
 	scheduleExprRate = regexp.MustCompile(`^rate\(([^)]+)\)$`)
-	scheduleExprAt = regexp.MustCompile(`^at\(([^)]+)\)$`)
-	rateExprRegexp = regexp.MustCompile(`^(\d+) (?:minute|minutes|hour|hours|day|days)$`)
-}
+	scheduleExprAt   = regexp.MustCompile(`^at\(([^)]+)\)$`)
+	rateExprRegexp   = regexp.MustCompile(`^(\d+) (?:minute|minutes|hour|hours|day|days)$`)
+)
 
 func Validate(expr string) error {
 	_, err := Eval(expr, "", 0)
