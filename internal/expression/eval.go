@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
-	cp "github.com/winebarrel/cronplan"
+	cp "github.com/winebarrel/cronplan/v2"
 )
 
 const (
