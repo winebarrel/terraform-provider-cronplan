@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.31.0
 	github.com/hashicorp/terraform-plugin-testing v1.16.0
 	github.com/stretchr/testify v1.12.1
-	github.com/winebarrel/cronplan/v2 v2.1.2
+	github.com/winebarrel/cronplan/v2 v2.1.3
 )
 
 require (
